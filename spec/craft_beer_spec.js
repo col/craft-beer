@@ -210,6 +210,43 @@ describe('craft_beer', () => {
 
   })
 
+  describe('#checkoutStep4', () => {
+    var requestStub = null
+
+    afterEach(() => {
+      requestStub.restore()
+    })
+
+    describe('when successful', () => {
+      beforeEach(() => {
+        requestStub = sinon.stub(request, 'post').returns(Promise.resolve({statusCode: 320, body: "...", headers:{location: "http://www.example.com/finishorder.php"}}));
+      })
+
+      it("should be successful", (done) => {
+        CraftBeer.checkoutStep4("token", "John Smith", "AMEX", "1234567890", "01", "20", "123").then(() => {
+          done()
+        }).catch(() => {
+          check(done, () => { expect(false).to.equal(true) })
+        })
+      })
+    })
+
+    describe('when unsuccessful', () => {
+      beforeEach(() => {
+        requestStub = sinon.stub(request, 'post').returns(Promise.resolve({statusCode: 320, body: "...", headers:{location: "http://www.example.com/cart.php"}}));
+      })
+
+      it("should return an error message", (done) => {
+        CraftBeer.checkoutStep4("token", "John Smith", "AMEX", "1234567890", "01", "20", "123").then(() => {
+          check(done, () => { expect(false).to.equal(true) })
+        }).catch(() => {
+          done()
+        })
+      })
+    })
+
+  })
+
 })
 
 function check(done, func) {
