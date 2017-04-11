@@ -163,7 +163,44 @@ describe('craft_beer', () => {
       })
 
       it("should return an error message", (done) => {
-        CraftBeer.checkoutStep1("token", "shippingMethod[abc]").then(() => {
+        CraftBeer.checkoutStep2("token", "shippingMethod[abc]").then(() => {
+          check(done, () => { expect(false).to.equal(true) })
+        }).catch(() => {
+          done()
+        })
+      })
+    })
+
+  })
+
+  describe('#checkoutStep3', () => {
+    var requestStub = null
+
+    afterEach(() => {
+      requestStub.restore()
+    })
+
+    describe('when successful', () => {
+      beforeEach(() => {
+        requestStub = sinon.stub(request, 'post').returns(Promise.resolve({statusCode: 200, body: "{ \"status\": 1 }", headers:{'set-cookie': ['SHOP_ORDER_TOKEN=xyz789;']}}));
+      })
+
+      it("should be successful", (done) => {
+        CraftBeer.checkoutStep3("token").then((orderToken) => {
+          check(done, () => { expect(orderToken).to.equal("xyz789") })
+        }).catch(() => {
+          check(done, () => { expect(false).to.equal(true) })
+        })
+      })
+    })
+
+    describe('when unsuccessful', () => {
+      beforeEach(() => {
+        requestStub = sinon.stub(request, 'post').returns(Promise.resolve({statusCode: 200, body: "{ \"status\": 0 }"}));
+      })
+
+      it("should return an error message", (done) => {
+        CraftBeer.checkoutStep3("token").then((_orderToken) => {
           check(done, () => { expect(false).to.equal(true) })
         }).catch(() => {
           done()
