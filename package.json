@@ -1,0 +1,21 @@
+{
+  "name": "craft-beer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha spec/**/**_spec.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.81.0",
+    "request-promise": "^4.2.0",
+    "tough-cookie": "^2.3.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "sinon": "^2.1.0"
+  }
+}
