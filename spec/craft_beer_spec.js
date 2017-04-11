@@ -22,8 +22,9 @@ describe('craft_beer', () => {
 
       it('should return the session token', (done) => {
         CraftBeer.login("username", "password").then((token) => {
-          expect(token).to.equal("abcd1234")
-          done()
+          check(done, () => { expect(token).to.equal("abcd1234") })
+        }).catch(() => {
+          check(done, () => { expect(false).to.equal(true) })
         })
       })
     })
@@ -38,9 +39,10 @@ describe('craft_beer', () => {
       })
 
       it('should return an error message', (done) => {
-        CraftBeer.login("username", "password").catch((error) => {
-          expect(error).to.equal("Login failed")
-          done()
+        CraftBeer.login("username", "password").then(() => {
+          check(done, () => { expect(false).to.equal(true) })
+        }).catch((error) => {
+          check(done, () => { expect(error).to.equal("Login failed") })
         })
       })
     })
@@ -62,8 +64,8 @@ describe('craft_beer', () => {
       it('should be successful', (done) => {
         CraftBeer.addToCart("token", "123").then(() => {
           done()
-        }).catch((error) => {
-          expect(false).to.equal(true)
+        }).catch(() => {
+          check(done, () => { expect(false).to.equal(true) })
         })
       })
     })
@@ -79,7 +81,7 @@ describe('craft_beer', () => {
 
       it('should return an error', (done) => {
         CraftBeer.addToCart("token", "invalid").then(() => {
-          expect(false).to.equal(true)
+          check(done, () => { expect(false).to.equal(true) })
         }).catch((error) => {
           done()
         })
@@ -88,4 +90,55 @@ describe('craft_beer', () => {
 
   })
 
+  describe('#checkoutStep1', () => {
+    var requestStub = null
+
+    describe('when successful', () => {
+      beforeEach(() => {
+        var stepContent = JSON.stringify([{id: "ShippingProvider", content: "... selectedShippingMethod[randomStr] ..."}])
+        requestStub = sinon.stub(request, 'post').returns(Promise.resolve({statusCode: 200, body: "{ \"status\": 1, \"stepContent\": "+stepContent+" }"}));
+      })
+
+      afterEach(() => {
+        requestStub.restore()
+      })
+
+      it("should be successful and return the shipping method identifier", (done) => {
+        CraftBeer.checkoutStep1("token").then((shippingMethod) => {
+          check(done, () => { expect(shippingMethod).to.equal("selectedShippingMethod[randomStr]") })
+        }).catch(() => {
+          check(done, () => { expect(false).to.equal(true) })
+        })
+      })
+    })
+
+    describe('when unsuccessful', () => {
+      beforeEach(() => {
+        requestStub = sinon.stub(request, 'post').returns(Promise.resolve({statusCode: 200, body: "{ \"status\": 0 }"}));
+      })
+
+      afterEach(() => {
+        requestStub.restore()
+      })
+
+      it("should return an error message", (done) => {
+        CraftBeer.checkoutStep1("token").then(() => {
+          check(done, () => { expect(false).to.equal(true) })
+        }).catch(() => {
+          done()
+        })
+      })
+    })
+
+  })
+
 })
+
+function check(done, func) {
+  try {
+    func()
+    done()
+  } catch(e) {
+    done(e)
+  }
+}
