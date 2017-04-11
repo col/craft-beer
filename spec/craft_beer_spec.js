@@ -30,7 +30,7 @@ describe('craft_beer', () => {
 
     describe('when unsuccessful', () => {
       beforeEach(() => {
-        sinon.stub(request, 'post').returns(Promise.resolve({statusCode: 302, headers:{location: "http://www.example.com/login"}}));
+        postStub = sinon.stub(request, 'post').returns(Promise.resolve({statusCode: 302, headers:{location: "http://www.example.com/login"}}));
       })
 
       afterEach(() => {
@@ -40,6 +40,47 @@ describe('craft_beer', () => {
       it('should return an error message', (done) => {
         CraftBeer.login("username", "password").catch((error) => {
           expect(error).to.equal("Login failed")
+          done()
+        })
+      })
+    })
+
+  })
+
+  describe('#addToCart', () => {
+    var getStub = null
+
+    describe('when successful', () => {
+      beforeEach(() => {
+        getStub = sinon.stub(request, 'get').returns(Promise.resolve({statusCode: 200, body: "{ \"success\": true }"}));
+      })
+
+      afterEach(() => {
+        getStub.restore()
+      })
+
+      it('should be successful', (done) => {
+        CraftBeer.addToCart("token", "123").then(() => {
+          done()
+        }).catch((error) => {
+          expect(false).to.equal(true)
+        })
+      })
+    })
+
+    describe('when unsuccessful', () => {
+      beforeEach(() => {
+        getStub = sinon.stub(request, 'get').returns(Promise.resolve({statusCode: 200, body: "{ \"success\": false }"}));
+      })
+
+      afterEach(() => {
+        getStub.restore()
+      })
+
+      it('should return an error', (done) => {
+        CraftBeer.addToCart("token", "invalid").then(() => {
+          expect(false).to.equal(true)
+        }).catch((error) => {
           done()
         })
       })
