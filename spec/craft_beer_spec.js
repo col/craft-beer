@@ -219,7 +219,7 @@ describe('craft_beer', () => {
 
     describe('when successful', () => {
       beforeEach(() => {
-        requestStub = sinon.stub(request, 'post').returns(Promise.resolve({statusCode: 320, body: "...", headers:{location: "http://www.example.com/finishorder.php"}}));
+        requestStub = sinon.stub(request, 'post').returns(Promise.resolve({statusCode: 302, body: "...", headers:{location: "http://www.example.com/finishorder.php"}}));
       })
 
       it("should be successful", (done) => {

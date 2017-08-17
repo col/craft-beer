@@ -20,31 +20,16 @@ CraftBeer.login(username, password)
 })
 .then(() => {
   console.log("Item added to cart")
-  return CraftBeer.checkoutStep1(token, addressId) // Existing Address Id
-})
-.then((shippingMethod) => {
-  console.log("Checkout step 1 successful")
-  console.log("shippingMethod:", shippingMethod)
-  return CraftBeer.checkoutStep2(token, shippingMethod)
-})
-.then(() => {
-  console.log("Checkout step 2 successful")
-  return CraftBeer.checkoutStep3(token)
-})
-.then((orderToken) => {
-  console.log("Checkout step 3 successful")
-  console.log("Order Token:", orderToken)
-  return CraftBeer.checkoutStep4(
+  return CraftBeer.checkout(
     token,
-    orderToken,
+    addressId,
     creditCardName,
     creditCardType,
     creditCardNumber,
     creditCardExpiryMonth,
     creditCardExpiryYear,
-    creditCardExpiryCCV
+    creditCardCCV
   )
-  return
 })
 .then(() => {
   console.log("Order Complete!")
